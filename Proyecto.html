@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UVM - Sistema DYGS - Evaluación Docente</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background-color: #f4f6f9;
+      color: #333;
+    }
+
+    header {
+      background-color: #b30000;
+      color: #fff;
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    header h1 {
+      font-size: 18px;
+      text-align: center;
+      flex: 1;
+      white-space: nowrap;
+    }
+
+    nav {
+      display: flex;
+      gap: 8px;
+    }
+
+    nav button {
+      background-color: #800000;
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    nav button:hover {
+      background-color: #4a0000;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 20px auto;
+      padding: 0 15px;
+    }
+
+    .card {
+      background-color: white;
+      padding: 20px;
+      border-radius: 6px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+    }
+
+    .card h2 {
+      margin-bottom: 15px;
+      color: #b30000;
+      border-bottom: 2px solid #e2e8f0;
+      padding-bottom: 5px;
+    }
+
+    .screen {
+      display: none;
+    }
+
+    .screen.active {
+      display: block;
+    }
+
+    .login-form {
+      max-width: 400px;
+      margin: 30px auto;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+
+    .form-group input, .form-group select {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    .btn {
+      background-color: #b30000;
+      color: white;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      width: 100%;
+      font-size: 16px;
+    }
+
+    .btn:hover {
+      background-color: #800000;
+    }
+
+    .btn-secondary {
+      background-color: #6c757d;
+      margin-top: 5px;
+    }
+
+    .links-container {
+      margin-top: 15px;
+      text-align: center;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .links-container a {
+      color: #b30000;
+      font-size: 13px;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+
+    table th, table td {
+      border: 1px solid #cbd5e0;
+      padding: 10px;
+      text-align: left;
+    }
+
+    table th {
+      background-color: #edf2f7;
+    }
+
+    .progress-bar {
+      background-color: #e2e8f0;
+      border-radius: 10px;
+      overflow: hidden;
+      height: 20px;
+      width: 100%;
+    }
+
+    .progress-fill {
+      background-color: #38a169;
+      height: 100%;
+      width: 50%;
+      text-align: center;
+      color: white;
+      font-size: 12px;
+      line-height: 20px;
+      transition: width 0.4s ease;
+    }
+
+    .badge {
+      padding: 4px 8px;
+      border-radius: 4px;
+      color: white;
+      font-size: 12px;
+      font-weight: bold;
+    }
+
+    .badge-success { background-color: #38a169; }
+    .badge-warning { background-color: #dd6b20; }
+    .badge-danger { background-color: #e53e3e; }
+
+    .question-item {
+      margin-bottom: 15px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #edf2f7;
+    }
+
+    .question-item p {
+      margin-bottom: 8px;
+      font-weight: 500;
+    }
+
+    .options-group {
+      display: flex;
+      gap: 15px;
+    }
+
+    .options-group label {
+      font-size: 14px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>UVM - Sistema DYGS - Evaluación Docente</h1>
+    <nav id="nav-menu" style="display: none;">
+      <button id="btn-nav-alumno" onclick="showScreen('screen-alumno')">Módulo Alumno</button>
+      <button id="btn-nav-coord" onclick="showScreen('screen-coordinacion')">Coordinación</button>
+      <button id="btn-nav-ind" onclick="showScreen('screen-indicadores')">Indicadores</button>
+      <button onclick="logout()">Cerrar Sesión</button>
+    </nav>
+  </header>
+
+  <div class="container">
+
+    <!-- PANTALLA 1: LOGIN -->
+    <div id="screen-login" class="screen active">
+      <div class="card login-form">
+        <h2>Inicio de Sesión</h2>
+        <form onsubmit="event.preventDefault(); login();">
+          <div class="form-group">
+            <label>Número de Cuenta / Correo</label>
+            <input type="text" id="userInput" placeholder="Ej. 12345678" required>
+          </div>
+          <div class="form-group">
+            <label>Contraseña</label>
+            <input type="password" id="passInput" placeholder="******" required>
+          </div>
+          <div class="form-group">
+            <label>Perfil</label>
+            <select id="roleSelect">
+              <option value="alumno">Alumno</option>
+              <option value="coordinador">Coordinador Académico</option>
+              <option value="docente">Docente</option>
+              <option value="admin">Administrador</option>
+            </select>
+          </div>
+          <button type="submit" class="btn">Ingresar</button>
+          
+          <div class="links-container">
+            <a onclick="showScreen('screen-registro')">Registrar Cuenta</a>
+            <a onclick="showScreen('screen-cambiar-pass')">Cambiar Contraseña</a>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- PANTALLA: REGISTRO DE CUENTA -->
+    <div id="screen-registro" class="screen">
+      <div class="card login-form">
+        <h2>Registro de Usuario</h2>
+        <form onsubmit="event.preventDefault(); registrarUsuario();">
+          <div class="form-group">
+            <label>Número de Cuenta / Correo</label>
+            <input type="text" id="regUser" placeholder="Ej. 12345678" required>
+          </div>
+          <div class="form-group">
+            <label>Contraseña</label>
+            <input type="password" id="regPass" placeholder="******" required>
+          </div>
+          <div class="form-group">
+            <label>Perfil</label>
+            <select id="regRole">
+              <option value="alumno">Alumno</option>
+              <option value="coordinador">Coordinador Académico</option>
+              <option value="docente">Docente</option>
+              <option value="admin">Administrador</option>
+            </select>
+          </div>
+          <button type="submit" class="btn">Guardar Registro en MySQL</button>
+          <button type="button" class="btn btn-secondary" onclick="showScreen('screen-login')">Cancelar</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- PANTALLA: CAMBIAR CONTRASEÑA -->
+    <div id="screen-cambiar-pass" class="screen">
+      <div class="card login-form">
+        <h2>Cambiar Contraseña</h2>
+        <form onsubmit="event.preventDefault(); cambiarPass();">
+          <div class="form-group">
+            <label>Número de Cuenta / Correo</label>
+            <input type="text" id="changeUser" placeholder="Ej. 12345678" required>
+          </div>
+          <div class="form-group">
+            <label>Contraseña Actual</label>
+            <input type="password" id="changePassOld" placeholder="******" required>
+          </div>
+          <div class="form-group">
+            <label>Nueva Contraseña</label>
+            <input type="password" id="changePassNew" placeholder="******" required>
+          </div>
+          <button type="submit" class="btn">Actualizar Contraseña</button>
+          <button type="button" class="btn btn-secondary" onclick="showScreen('screen-login')">Volver al Login</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- PANTALLA 2: MÓDULO ALUMNO -->
+    <div id="screen-alumno" class="screen">
+      <div class="card">
+        <h2>Avance de Evaluaciones</h2>
+        <p><strong>Estatus:</strong> <span id="estatus-texto">Pendientes evaluaciones del ciclo lectivo actual.</span></p>
+        <br>
+        <div class="progress-bar">
+          <div id="progress-fill" class="progress-fill" style="width: 50%;">50% Completado</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Docentes a Evaluar</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Materia</th>
+              <th>Docente</th>
+              <th>Estatus</th>
+              <th>Acción</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Redes Avanzadas</td>
+              <td>Ing. Adrian Sanroman</td>
+              <td><span id="badge-redes" class="badge badge-warning">Pendiente</span></td>
+              <td><button id="btn-redes" class="btn" style="width: auto; padding: 5px 10px;" onclick="openEvaluation('Ing. Adrian Sanroman', 'Redes Avanzadas')">Evaluar</button></td>
+            </tr>
+            <tr>
+              <td>Bases de Datos</td>
+              <td>Dr. Samuel</td>
+              <td><span class="badge badge-success">Completado</span></td>
+              <td><button disabled style="padding: 5px 10px;">Completado</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Cuestionario de Evaluación -->
+      <div id="eval-form-card" class="card" style="display: none;">
+        <h2 id="eval-title">Cuestionario de Evaluación Docente</h2>
+        <p style="margin-bottom: 15px; color: #666;">Selecciona el valor correspondiente a cada aspecto (0: Muy Deficiente - 10: Excelente).</p>
+        
+        <form id="form-evaluacion" onsubmit="event.preventDefault(); submitEvaluation();">
+          <div class="question-item">
+            <p>1. Dominio de la materia</p>
+            <div class="options-group">
+              <label><input type="radio" name="q1" value="0" required> 0</label>
+              <label><input type="radio" name="q1" value="2.5"> 2.5</label>
+              <label><input type="radio" name="q1" value="5.0"> 5.0</label>
+              <label><input type="radio" name="q1" value="7.5"> 7.5</label>
+              <label><input type="radio" name="q1" value="10"> 10</label>
+            </div>
+          </div>
+
+          <div class="question-item">
+            <p>2. Planeación de clases</p>
+            <div class="options-group">
+              <label><input type="radio" name="q2" value="0" required> 0</label>
+              <label><input type="radio" name="q2" value="2.5"> 2.5</label>
+              <label><input type="radio" name="q2" value="5.0"> 5.0</label>
+              <label><input type="radio" name="q2" value="7.5"> 7.5</label>
+              <label><input type="radio" name="q2" value="10"> 10</label>
+            </div>
+          </div>
+
+          <div class="question-item">
+            <p>3. Claridad en las explicaciones</p>
+            <div class="options-group">
+              <label><input type="radio" name="q3" value="0" required> 0</label>
+              <label><input type="radio" name="q3" value="2.5"> 2.5</label>
+              <label><input type="radio" name="q3" value="5.0"> 5.0</label>
+              <label><input type="radio" name="q3" value="7.5"> 7.5</label>
+              <label><input type="radio" name="q3" value="10"> 10</label>
+            </div>
+          </div>
+
+          <div class="question-item">
+            <p>4. Fomento de la participación</p>
+            <div class="options-group">
+              <label><input type="radio" name="q4" value="0" required> 0</label>
+              <label><input type="radio" name="q4" value="2.5"> 2.5</label>
+              <label><input type="radio" name="q4" value="5.0"> 5.0</label>
+              <label><input type="radio" name="q4" value="7.5"> 7.5</label>
+              <label><input type="radio" name="q4" value="10"> 10</label>
+            </div>
+          </div>
+
+          <div class="question-item">
+            <p>5. Uso de recursos didácticos</p>
+            <div class="options-group">
+              <label><input type="radio" name="q5" value="0" required> 0</label>
+              <label><input type="radio" name="q5" value="2.5"> 2.5</label>
+              <label><input type="radio" name="q5" value="5.0"> 5.0</label>
+              <label><input type="radio" name="q5" value="7.5"> 7.5</label>
+              <label><input type="radio" name="q5" value="10"> 10</label>
+            </div>
+          </div>
+
+          <button type="submit" class="btn">Enviar Evaluación a MySQL</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- PANTALLA 3: DASHBOARD COORDINACIÓN -->
+    <div id="screen-coordinacion" class="screen">
+      <div class="card">
+        <h2>Dashboard de Seguimiento de Evaluaciones</h2>
+        <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+          <select id="filterCarrera" onchange="updateDashboardMetrics()" style="padding: 5px;">
+            <option value="todas">Todas las Carreras</option>
+            <option value="ingenieria">Ingeniería</option>
+            <option value="administracion">Administración</option>
+          </select>
+          <select id="filterGrupo" onchange="updateDashboardMetrics()" style="padding: 5px;">
+            <option value="todos">Todos los Grupos</option>
+            <option value="grupoA">Grupo A</option>
+            <option value="grupoB">Grupo B</option>
+          </select>
+        </div>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Indicador</th>
+              <th>Valor</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Total Alumnos</td>
+              <td id="dash-tot-alumnos">500</td>
+            </tr>
+            <tr>
+              <td>Evaluaciones Esperadas</td>
+              <td id="dash-eval-esp">2,500</td>
+            </tr>
+            <tr>
+              <td>Evaluaciones Realizadas</td>
+              <td id="dash-eval-real">2,100</td>
+            </tr>
+            <tr>
+              <td>Evaluaciones Pendientes</td>
+              <td id="dash-eval-pen">400</td>
+            </tr>
+            <tr>
+              <td><strong>Porcentaje de Avance Global</strong></td>
+              <td><strong id="dash-porcentaje">84%</strong></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- PANTALLA 4: INDICADORES DOCENTES -->
+    <div id="screen-indicadores" class="screen">
+      <div class="card">
+        <h2>Indicadores y Ranking Docente</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Docente</th>
+              <th>Promedio</th>
+              <th>Categoría</th>
+              <th>Estatus</th>
+              <th>Materias Asignadas</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Dr. Samuel</td>
+              <td>9.5</td>
+              <td>Excelente</td>
+              <td><span class="badge badge-success">Altamente Recomendado</span></td>
+              <td>4 materias</td>
+            </tr>
+            <tr>
+              <td>Ing. Adrian Sanroman</td>
+              <td>8.4</td>
+              <td>Bueno</td>
+              <td><span class="badge badge-success">Recomendado</span></td>
+              <td>3 materias</td>
+            </tr>
+            <tr>
+              <td>Mtro. Luis Velázquez</td>
+              <td>6.2</td>
+              <td>No Suficiente</td>
+              <td><span class="badge badge-danger">No Contratable</span></td>
+              <td>0 materias</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const API_URL = 'http://localhost:3000/api';
+    let usuarioActual = '';
+    let docenteActual = '';
+    let materiaActual = '';
+
+    function showScreen(screenId) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.getElementById(screenId).classList.add('active');
+    }
+
+    async function login() {
+      const cuenta = document.getElementById('userInput').value;
+      const password = document.getElementById('passInput').value;
+      const perfil = document.getElementById('roleSelect').value;
+
+      try {
+        const response = await fetch(`${API_URL}/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ cuenta, password, perfil })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          usuarioActual = cuenta;
+          alert('¡Inicio de sesión validado correctamente en la Base de Datos MySQL!');
+          document.getElementById('nav-menu').style.display = 'flex';
+          
+          if (perfil === 'coordinador' || perfil === 'admin') {
+            showScreen('screen-coordinacion');
+          } else if (perfil === 'docente') {
+            showScreen('screen-indicadores');
+          } else {
+            showScreen('screen-alumno');
+          }
+        } else {
+          alert(data.message || 'Credenciales o perfil incorrectos');
+        }
+      } catch (err) {
+        alert('No se pudo conectar con el servidor Backend/MySQL. Verifica que "node server.js" esté corriendo.');
+      }
+    }
+
+    async function registrarUsuario() {
+      const cuenta = document.getElementById('regUser').value;
+      const password = document.getElementById('regPass').value;
+      const perfil = document.getElementById('regRole').value;
+
+      try {
+        const response = await fetch(`${API_URL}/registro`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ cuenta, password, perfil })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          alert('¡Usuario registrado e insertado con éxito en MySQL!');
+          showScreen('screen-login');
+        } else {
+          alert(data.error || 'Error al registrar usuario.');
+        }
+      } catch (err) {
+        alert('Error de conexión con el servidor.');
+      }
+    }
+
+    async function cambiarPass() {
+      const cuenta = document.getElementById('changeUser').value;
+      const passwordActual = document.getElementById('changePassOld').value;
+      const passwordNueva = document.getElementById('changePassNew').value;
+
+      try {
+        const response = await fetch(`${API_URL}/cambiar-password`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ cuenta, passwordActual, passwordNueva })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          alert('¡Contraseña actualizada con éxito en la Base de Datos MySQL!');
+          showScreen('screen-login');
+        } else {
+          alert(data.error || 'Error al actualizar contraseña.');
+        }
+      } catch (err) {
+        alert('Error de conexión con el servidor.');
+      }
+    }
+
+    function openEvaluation(docente, materia) {
+      docenteActual = docente;
+      materiaActual = materia;
+      const card = document.getElementById('eval-form-card');
+      document.getElementById('eval-title').innerText = 'Evaluando a: ' + docente + ' (' + materia + ')';
+      card.style.display = 'block';
+      card.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    async function submitEvaluation() {
+      const q1 = parseFloat(document.querySelector('input[name="q1"]:checked').value);
+      const q2 = parseFloat(document.querySelector('input[name="q2"]:checked').value);
+      const q3 = parseFloat(document.querySelector('input[name="q3"]:checked').value);
+      const q4 = parseFloat(document.querySelector('input[name="q4"]:checked').value);
+      const q5 = parseFloat(document.querySelector('input[name="q5"]:checked').value);
+      
+      const promedio = (q1 + q2 + q3 + q4 + q5) / 5;
+
+      try {
+        const response = await fetch(`${API_URL}/guardar-evaluacion`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            alumno_cuenta: usuarioActual || '12345678',
+            docente: docenteActual,
+            materia: materiaActual,
+            q1, q2, q3, q4, q5,
+            promedio
+          })
+        });
+
+        if (response.ok) {
+          alert('¡Evaluación registrada exitosamente en MySQL!');
+          document.getElementById('eval-form-card').style.display = 'none';
+
+          const fill = document.getElementById('progress-fill');
+          fill.style.width = '100%';
+          fill.innerText = '100% Completado';
+
+          document.getElementById('estatus-texto').innerText = 'Todas las evaluaciones del ciclo lectivo actual han sido completadas.';
+
+          const badge = document.getElementById('badge-redes');
+          badge.className = 'badge badge-success';
+          badge.innerText = 'Completado';
+
+          const btn = document.getElementById('btn-redes');
+          btn.disabled = true;
+          btn.innerText = 'Completado';
+          btn.style.backgroundColor = '#6c757d';
+        }
+      } catch (err) {
+        alert('Error guardando la evaluación en el servidor.');
+      }
+    }
+
+    function updateDashboardMetrics() {
+      const carrera = document.getElementById('filterCarrera').value;
+      const grupo = document.getElementById('filterGrupo').value;
+
+      let total = 500;
+      let realizadas = 2100;
+      let esperadas = 2500;
+
+      if(carrera === 'ingenieria') {
+        total = 300; esperadas = 1500; realizadas = 1350;
+      } else if(carrera === 'administracion') {
+        total = 200; esperadas = 1000; realizadas = 750;
+      }
+
+      if(grupo === 'grupoA') {
+        total = Math.round(total * 0.6);
+        esperadas = Math.round(esperadas * 0.6);
+        realizadas = Math.round(realizadas * 0.6);
+      } else if(grupo === 'grupoB') {
+        total = Math.round(total * 0.4);
+        esperadas = Math.round(esperadas * 0.4);
+        realizadas = Math.round(realizadas * 0.4);
+      }
+
+      const pendientes = esperadas - realizadas;
+      const pct = Math.round((realizadas / esperadas) * 100);
+
+      document.getElementById('dash-tot-alumnos').innerText = total;
+      document.getElementById('dash-eval-esp').innerText = esperadas.toLocaleString();
+      document.getElementById('dash-eval-real').innerText = realizadas.toLocaleString();
+      document.getElementById('dash-eval-pen').innerText = pendientes.toLocaleString();
+      document.getElementById('dash-porcentaje').innerText = pct + '%';
+    }
+
+    function logout() {
+      document.getElementById('nav-menu').style.display = 'none';
+      showScreen('screen-login');
+    }
+  </script>
+</body>
+</html>
