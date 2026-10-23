@@ -115,31 +115,22 @@
       </div>
 
       <div class="card">
-        <h2>Docentes a Evaluar</h2>
-        <table>
-          <thead>
-            <tr>
-              <th>Materia</th>
-              <th>Docente</th>
-              <th>Estatus</th>
-              <th>Acción</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Redes Avanzadas</td>
-              <td>Ing. Adrian Sanroman</td>
-              <td><span id="badge-redes" class="badge badge-warning">Pendiente</span></td>
-              <td><button id="btn-redes" class="btn" style="width: auto; padding: 5px 10px;" onclick="openEvaluation('Ing. Adrian Sanroman', 'Redes Avanzadas')">Evaluar</button></td>
-            </tr>
-            <tr>
-              <td>Bases de Datos</td>
-              <td>Dr. Samuel</td>
-              <td><span class="badge badge-success">Completado</span></td>
-              <td><button disabled style="padding: 5px 10px;">Completado</button></td>
-            </tr>
-          </tbody>
-        </table>
+          <h2>Docentes a Evaluar</h2>
+
+          <table>
+              <thead>
+                  <tr>
+                      <th>Materia</th>
+                      <th>Docente</th>
+                      <th>Estatus</th>
+                      <th>Acción</th>
+                  </tr>
+              </thead>
+
+              <tbody id="tabla-docentes-body">
+              </tbody>
+
+          </table>
       </div>
 
       <!-- Cuestionario de Evaluación -->
