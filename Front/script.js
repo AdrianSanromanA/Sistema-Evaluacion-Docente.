@@ -55,6 +55,9 @@ async function login() {
 
             showScreen('screen-coordinacion');
 
+            // Cargar los docentes filtrados por el área de la coordinadora
+            const areaCoordinador = cuenta === 'esmeralda' ? 'Ingeniería' : 'Idiomas';
+            cargarDocentesCoordinador(areaCoordinador);
 
         } else if (perfil === 'docente') {
 
@@ -526,4 +529,48 @@ function actualizarProgreso(cursos) {
 
     }
 
+}
+
+
+// =========================================================
+// FUNCIÓN PARA CARGAR DOCENTES DEL COORDINADOR
+// =========================================================
+
+async function cargarDocentesCoordinador(area) {
+    try {
+        const response = await fetch(`${API_URL}/coordinador/${area}/docentes`);
+        if (!response.ok) {
+            throw new Error('Error al obtener los docentes del área');
+        }
+        const docentes = await response.json();
+        
+        // Actualizar el título con el área correspondiente
+        const tituloArea = document.getElementById('subtitulo-area');
+        if (tituloArea) {
+            tituloArea.textContent = `Coordinación de ${area}`;
+        }
+
+        const tbody = document.getElementById('tabla-coordinador-body'); 
+        if (!tbody) return;
+        
+        tbody.innerHTML = '';
+
+        if (docentes.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="3">No hay docentes registrados en esta área.</td></tr>';
+            return;
+        }
+
+        docentes.forEach(doc => {
+            const fila = document.createElement('tr');
+            fila.innerHTML = `
+                <td>${doc.docente}</td>
+                <td>${doc.materia}</td>
+                <td>${Number(doc.calificacion_promedio).toFixed(2)}</td>
+            `;
+            tbody.appendChild(fila);
+        });
+    } catch (error) {
+        console.error('Error:', error);
+        alert('No se pudieron cargar los datos de la coordinación.');
+    }
 }
